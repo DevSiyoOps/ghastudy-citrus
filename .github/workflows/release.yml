@@ -26,11 +26,14 @@ on:
 
 jobs:
   release:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.repository == 'citrusframework/citrus'
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      with:
+        persist-credentials: false
     - name: Retrieve project metadata
       id: metadata
       uses: radcortez/project-metadata-action@main
@@ -40,9 +43,11 @@ jobs:
         local-file: true
     - name: Prepare Release Environment
       run: |
-        VERSION=v${{ steps.metadata.outputs.current-version }}
+        VERSION=v${STEPS_METADATA_OUTPUTS_CURRENT_VERSION}
         echo "Using VERSION=$VERSION"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
+      env:
+        STEPS_METADATA_OUTPUTS_CURRENT_VERSION: ${{ steps.metadata.outputs.current-version }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
